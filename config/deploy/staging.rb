@@ -4,9 +4,7 @@
 # server in each group is considered to be the first
 # unless any hosts have the primary property set.
 # Don't declare `role :all`, it's a meta role
-role :app, %w{deploy@example.com}
-role :web, %w{deploy@example.com}
-role :db,  %w{deploy@example.com}
+role :app, %w{vagrant@node}
 
 # Extended Server Syntax
 # ======================
@@ -14,7 +12,7 @@ role :db,  %w{deploy@example.com}
 # definition into the server list. The second argument
 # something that quacks like a hash can be used to set
 # extended properties on the server.
-server 'example.com', user: 'deploy', roles: %w{web app}, my_property: :my_value
+server 'node', user: 'deploy', roles: %w{web app}
 
 # you can set custom ssh options
 # it's possible to pass any option but you need to keep in mind that net/ssh understand limited list of options
@@ -37,3 +35,28 @@ server 'example.com', user: 'deploy', roles: %w{web app}, my_property: :my_value
 #     # password: 'please use keys'
 #   }
 # setting per server overrides global ssh_options
+
+   desc "Check that we can access everything"
+   task :check_write_permissions do
+      on roles(:all) do |host|
+         if test("[ -w #{fetch(:deploy_to)} ]")
+            info "#{fetch(:deploy_to)} is writable on #{host}"
+         else
+            error "#{fetch(:deploy_to)} is not writable on #{host}"
+         end
+      end
+   end
+
+   desc "Install npm"
+   task :install_npm do
+      on roles(:all) do |host|
+         execute "cd #{current_path} && npm install"
+      end
+   end
+
+   desc "Run node"
+   task :run_node do
+      on roles(:all) do |host|
+         execute "cd #{current_path} && node app"
+      end
+   end

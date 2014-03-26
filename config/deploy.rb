@@ -1,8 +1,10 @@
 # config valid only for Capistrano 3.1
 lock '3.1.0'
 
-set :application, 'my_app_name'
-set :repo_url, 'git@example.com:me/my_repo.git'
+set :application, 'node-couchbase-example'
+set :repo_url, 'git@github.com:caspian311/node-couchbase-example.git'
+set :branch, 'master'
+set :deploy_to, '/var/node/node-couchbase-example'
 
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
