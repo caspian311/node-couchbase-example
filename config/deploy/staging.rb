@@ -47,16 +47,28 @@ server 'node', user: 'deploy', roles: %w{web app}
       end
    end
 
-   desc "Install npm"
-   task :install_npm do
-      on roles(:all) do |host|
-         execute "cd #{current_path} && npm install"
+   namespace :deploy do
+      desc "Install npm"
+      task :install_npm do
+         on roles(:all) do |host|
+            execute "cd #{current_path} && npm install"
+         end
       end
-   end
 
-   desc "Run node"
-   task :run_node do
-      on roles(:all) do |host|
-         execute "cd #{current_path} && node app"
+      desc "Run node"
+      task :run_node do
+         on roles(:all) do |host|
+            execute <<EOC
+            ( cd #{current_path}
+               node app &> /var/log/node/output.log & echo $! > /var/tmp/node.pid )
+EOC
+         end
+      end
+
+      desc "Stop node"
+      task :stop_node do
+         on roles(:all) do |host|
+            execute "kill $(cat /var/tmp/node.pid) && rm -f /var/tmp/node.pid"
+         end
       end
    end
